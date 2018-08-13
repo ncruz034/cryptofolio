@@ -1,20 +1,118 @@
+
+
 const express = require('express');
 const app = express();
-const currency = require('./routes/currency');
+//const currencies = require('./routes/currencies');
+const home = require('./routes/home');
+
 const mongoose = require('mongoose');
+const router = express.Router()
+
+mongoose.connect('mongodb://localhost/cryptofolio')
+    .then(()=> console.log('Connected to MongoDB...'))
+    .catch(err => console.error('Could not connect to MongoDB',err))
 
 const currencySchema = new mongoose.Schema({
-    timestamp:{type: Date, default: Date.now},
-    pair:String,
-    type: String,
+    date:{type: Date, default: Date.now},
+    pair:{type:String, required:true},
+    type: String,//Order type (Limit,Market,etc.)
     side: String,
-    price:Number,  
-    amount:Number,//Number of coins purchased
+    price:Number, //price of the coin in BTC 
+    balance:Number,//Number of coins purchased
+    priceInUSD:Number,//This is the product of priceOfBTC * price
+    balanceInBTC:Number,//this the product of balance * priceInBTC
     symbol: String,
     priceOfBTC:Number//This is the price of Bitcoin at the time of purchase
     });
-//app.use('/api');
 
-app.listen(3000,()=>{
-    console.log('Listening on port: 3000');
-})
+const Currency = mongoose.model('Currency',currencySchema);
+
+async function createCurrency(){
+    const currency = new Currency({
+        date:'08-06-2018 01:45:55'	,
+        pair:'XLM/BTC',
+        type:'LIMIT',
+        side: 'BUY',
+        price:0.00001693, //price of the coin in BTC 
+        balance:5011,//Number of coins purchased
+        priceInUSD:0.113431,//This is the product of priceOfBTC * price
+        balanceInBTC:0.08483623,//this the product of balance * price
+        symbol: 'XLM',
+        priceOfBTC:7105.0342625//(priceInUsd * balance)/balanceInBTC
+    });
+
+    try{
+        const result = await currency.save();
+        console.log(result);
+    }catch(ex){
+        console.log(ex)
+    }
+    
+}
+createCurrency();
+
+
+async function getCurrencies(){
+    const currencies = await Currency
+    .find({symbol:'XLM'})
+    .sort({date: 1})
+    .select({pair:1,price:1,date:1});
+    console.log(currencies);
+}
+//We use this method by finding first the record then updating it
+async function findThenUpdateCurrency(id){
+    const currency = await Currency.findById(id);
+    if(!currency) return;
+    currency.side = 'SALE';
+    const result = await currency.save();
+    console.log(result);
+}
+//Update the record and returns the old document.
+async function updateCurrencyByIdReturnOld(id){
+    const currency = await Currency.findByIdAndUpdate(id,{
+        $set: {
+            side:'BUY'
+        }
+    });
+    console.log(currency);
+}
+//Update the record and returns the New document.
+async function updateCurrencyByIdReturnNew(id){
+    const currency = await Currency.findByIdAndUpdate(id,{
+        $set: {
+            side:'SALE'
+        },
+    },{
+        new:true});
+    console.log(currency);
+}
+//To update the document without returning it
+async function updateCurrency(id){
+    const result = await Currency.update({_id:id},{
+        $set: {
+            side:'BUY'
+        }
+    });
+    console.log(result);
+}
+
+//To update the document without returning it
+async function deleteCurrency(id){
+    const result = await Currency.deleteOne({_id:id});
+    console.log(result);
+}
+
+
+//updateCurrencyByIdReturnNew('5b6ba9a59b07cf9f5462b53f');
+//updateCurrencyByIdReturnOld('5b6ba9a59b07cf9f5462b53f');
+//updateCurrency('5b6ba9a59b07cf9f5462b53f');
+//findThenUpdateCurrency('5b6ba2389eb7210bd171e123');
+//getCurrencies();
+
+//app.use(express.json());
+//app.use('/api/currencies',currencies);
+//app.use('/',home);
+
+const port = process.env.PORT || 3000;
+
+app.listen(port ,()=>{console.log(`Listening on port ${port}...`);})
