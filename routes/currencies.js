@@ -1,85 +1,60 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-
-
-
-    const Currency = mongoose.model('Currency',new mongoose.Schema({
-        date:{type: Date, default: Date.now},
-        pair:{type:String, required:true},
-        type: {type:String, required:true},//Order type (Limit,Market,etc.)
-        side: {type:String, required:true},
-        price:Number, //price of the coin in BTC 
-        balance:Number,//Number of coins purchased
-        priceInUSD:Number,//This is the product of priceOfBTC * price
-        balanceInBTC:Number,//this the product of balance * priceInBTC
-        symbol: {type:String, required:true},
-        priceOfBTC:Number//This is the price of Bitcoin at the time of purchase
-        }));
-
+const {Currency, validate} = require('../models/currency');
 
 //Get all currencies
-router.get('/',(req,res) =>{
-    const currencies = await Currency
-    .find({symbol:'XLM'})
-    .sort({date: 1})
-    .select({pair:1,price:1,date:1});
-
+router.get('/', async (req,res) =>{
+    const currencies = await Currency.find().sort('symbol');
     res.send(currencies);
 });
 
 //Get a currency by id
-router.get('/:id',(req,res) =>{
-    
-    const currency = currencies.find(g => g.id ===parseInt(req.param.id));
-    if(!currency) res.status(404).send('The currency does not exists');
+router.get('/:id',async (req,res) =>{
+    const currency = await Currency.findById(req.params.id);
+     //check if there is any error
+     if(!currency) return res.status(400).send('The currency with the given symbol is not valid');
     res.send(currency);
 });
 
-router.put('/:id',(req,res) =>{
-    const currency = currencies.find(g => g.id ===parseInt(req.param.id));
-    if(!currency) return res.status(404).send('The currency does not exists');
-   
+router.put('/:id',async (req,res) =>{
      //validate the input
-     const {error} = validateCourse(req.body);
+     const {error} = validate(req.body);
      //check if there is any error
      if(error) return res.status(400).send(error.details[0].message);
+    const genre = await Currency.findByIdAndUpdate(req.params.id,{ symbol: req.body.symbol},{
+        new: true
+    });
+
+    if(!currency) return res.status(404).send('The currency does not exists');
    
-     currency.name = req.body.name;
     res.send(currency);
 });
 
-router.post('/',(req,res) =>{
-    const {error} = validateCourse(req.body.name);
+router.post('/',async (req,res) =>{
+    const {error} = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const currency = {
-        id:currencies.length +1,
-        name:req.body.name
-    }
-
-    currencies.push(currency);
+    let currency = new Currency({
+        date: req.body.date,
+        pair: req.body.pair,
+        type: req.body.type,
+        side: req.body.side,
+        price:req.body.price,
+        balance: req.body.balance,
+        priceInUSD: req.body.priceInUSD,
+        balanceInBTC: req.body.balanceInBTC,
+        symbol: req.body.symbol,
+        priceOfBTC: req.body.priceOfBTC
+    });
+    currency = await currency.save();
     res.send(currency);
 });
 
-router.delete('/',(req,res) =>{
-    const currency = currencies.find(c => c.id === parseInt(req.body.id));
+router.delete('/:id',async (req,res) =>{
+    const currency = await Currency.findByIdAndRemove(req.params.id);
     if(!currency) return res.status(404).send('The currency was not found');
-
-    const {error} = validateCourse(req.body.name);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    const index = currencies.indexOf(currency);
-    currencies.splice(index,1);
     res.send(currency);
 });
-
-function validateCourse(currency){
-    const schema = {
-        name: Joi.string().min(3).required()
-    };
-    return Joi.validate(currency, schema);
-    //check if there is any error
-}
 
 module.exports = router;

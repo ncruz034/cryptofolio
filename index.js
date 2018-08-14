@@ -1,32 +1,17 @@
 
 
 const express = require('express');
-const app = express();
-//const currencies = require('./routes/currencies');
-const home = require('./routes/home');
 
+const currencies = require('./routes/currencies');
+const home = require('./routes/home');
 const mongoose = require('mongoose');
+const app = express();
 const router = express.Router()
 
 mongoose.connect('mongodb://localhost/cryptofolio')
     .then(()=> console.log('Connected to MongoDB...'))
     .catch(err => console.error('Could not connect to MongoDB',err))
-
-const currencySchema = new mongoose.Schema({
-    date:{type: Date, default: Date.now},
-    pair:{type:String, required:true},
-    type: String,//Order type (Limit,Market,etc.)
-    side: String,
-    price:Number, //price of the coin in BTC 
-    balance:Number,//Number of coins purchased
-    priceInUSD:Number,//This is the product of priceOfBTC * price
-    balanceInBTC:Number,//this the product of balance * priceInBTC
-    symbol: String,
-    priceOfBTC:Number//This is the price of Bitcoin at the time of purchase
-    });
-
-const Currency = mongoose.model('Currency',currencySchema);
-
+/*
 async function createCurrency(){
     const currency = new Currency({
         date:'08-06-2018 01:45:55'	,
@@ -45,13 +30,11 @@ async function createCurrency(){
         const result = await currency.save();
         console.log(result);
     }catch(ex){
-        console.log(ex)
+        console.log(ex.message);
     }
     
 }
-createCurrency();
-
-
+//Get all currencies
 async function getCurrencies(){
     const currencies = await Currency
     .find({symbol:'XLM'})
@@ -95,7 +78,6 @@ async function updateCurrency(id){
     });
     console.log(result);
 }
-
 //To update the document without returning it
 async function deleteCurrency(id){
     const result = await Currency.deleteOne({_id:id});
@@ -103,16 +85,15 @@ async function deleteCurrency(id){
 }
 
 
+//createCurrency();
 //updateCurrencyByIdReturnNew('5b6ba9a59b07cf9f5462b53f');
 //updateCurrencyByIdReturnOld('5b6ba9a59b07cf9f5462b53f');
 //updateCurrency('5b6ba9a59b07cf9f5462b53f');
 //findThenUpdateCurrency('5b6ba2389eb7210bd171e123');
 //getCurrencies();
-
-//app.use(express.json());
-//app.use('/api/currencies',currencies);
-//app.use('/',home);
-
+*/
+app.use(express.json());
+app.use('/api/currencies', currencies);
 const port = process.env.PORT || 3000;
 
 app.listen(port ,()=>{console.log(`Listening on port ${port}...`);})
