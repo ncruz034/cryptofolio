@@ -1,12 +1,15 @@
-
-
-const express = require('express');
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+require("babel-polyfill");
 
 const currencies = require('./routes/currencies');
 const home = require('./routes/home');
-const mongoose = require('mongoose');
+//const express = require('express');
+//const mongoose = require('mongoose');
 const app = express();
-const router = express.Router()
+app.use(cors());
+//const router = express.Router()
 
 mongoose.connect('mongodb://localhost/cryptofolio')
     .then(()=> console.log('Connected to MongoDB...'))
