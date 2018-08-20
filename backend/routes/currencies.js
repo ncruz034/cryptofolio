@@ -51,7 +51,7 @@ router.post('/',async (req,res) =>{
     res.send(currency);
 });
 
-router.delete('/:id',async (req,res) =>{
+router.delete('/delete/:id',async (req,res) =>{
     const currency = await Currency.findByIdAndRemove(req.params.id);
     if(!currency) return res.status(404).send('The currency was not found');
     res.send(currency);

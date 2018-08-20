@@ -1,3 +1,72 @@
-<p>
-  create works!
-</p>
+<div>
+  <br>
+  <mat-card>
+
+    <section class = "mat-typography>">
+      <h3> Add new Coin</h3>
+    </section>
+
+    <mat-divider></mat-divider>
+
+    <br>
+    <form [formGroup]="createForm" class="create-form">
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Date" formControlName="date" #date>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Pair" formControlName="pair" #pair>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+          <mat-select placeholder = "Type" formControlName="side" #type>
+            <mat-option value = "Buy">Limit</mat-option>
+            <mat-option value = "Sale">Market</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <mat-select placeholder = "Side" formControlName="side" #side>
+          <mat-option value = "Buy">Buy</mat-option>
+          <mat-option value = "Sale">Sale</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Price" formControlName="price" #price>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Balance" formControlName="balance" #balance>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Balance BTC" formControlName="balanceInBTC" #balanceInBTC>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Symbol" formControlName="symbol" #symbol>
+      </mat-form-field>
+
+      <mat-form-field class="field-full-with">
+        <input matInput placeholder = "Price of BTC" formControlName="priceOfBTC" #priceOfBTC>
+      </mat-form-field>
+
+      <mat-divider></mat-divider>
+    </form>
+      <br><br>
+      <button mat-raised-button color = "accent" routerLink="/list">Back</button>
+      <button type="submit" (click)="addCurrency(date.value,
+                                                 pair.balue,
+                                                 type.value,
+                                                 side.value,
+                                                 price.value,
+                                                 balance.value,
+                                                 priceInUSD.value,
+                                                 balanceInBTC.value,
+                                                 symbol.value,
+                                                 priceOfBTC.value)" [disabled]="createForm.pristine || createForm.invalid" mat-raised-button color="primary">Save</button>&nbsp;
+  
+  </mat-card>
+</div>

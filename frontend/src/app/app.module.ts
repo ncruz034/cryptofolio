@@ -1,8 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import {Router,Routes, RouterModule} from '@angular/router';
-import {MatToolbarModule,MatTableModule,MatFormFieldModule,MatInputModule,MatOptionModule,MatSelectModule,MatIconModule,MatButtonModule,MatCardModule,MatDividerModule,MatSnackBarModule} from '@angular/material';
+import { Router,Routes, RouterModule} from '@angular/router';
+import { MatToolbarModule,MatTableModule,MatFormFieldModule,MatInputModule,MatOptionModule,
+         MatSelectModule,MatIconModule,MatButtonModule,MatCardModule,MatDividerModule,
+         MatSnackBarModule} from '@angular/material';
 import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule} from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -40,7 +43,8 @@ const routes: Routes = [
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    ReactiveFormsModule
   ],
   providers: [CurrencyService],
   bootstrap: [AppComponent]
